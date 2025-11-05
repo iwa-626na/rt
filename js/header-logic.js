@@ -29,6 +29,72 @@ document.addEventListener('DOMContentLoaded', () => {
       comp.style.zIndex= '0';
       
     });
+
+document.querySelectorAll('.slider').forEach(setupCarousel);
+
+function setupCarousel(slider) {
+  const slides = slider.querySelector('.slides');
+  const slideElements = slider.querySelectorAll('.slide');
+  const prevBtn = slider.querySelector('.prev');
+  const nextBtn = slider.querySelector('.next');
+
+  let slideWidth = slideElements[0].offsetWidth + 20; // 20 = gap
+  let currentIndex = 1;
+
+  // Clone first and last for infinite loop
+  const firstClone = slideElements[0].cloneNode(true);
+  const lastClone = slideElements[slideElements.length - 1].cloneNode(true);
+  slides.appendChild(firstClone);
+  slides.insertBefore(lastClone, slideElements[0]);
+
+  const allSlides = slider.querySelectorAll('.slide');
+  let totalSlides = allSlides.length;
+
+  // Position the first real slide
+  slides.style.transform = `translateX(-${slideWidth * currentIndex}px)`;
+
+  // Update on window resize
+  window.addEventListener('resize', () => {
+    slideWidth = slideElements[0].offsetWidth + 20;
+    updateSlider();
+  });
+
+  function updateSlider() {
+    slides.style.transition = 'transform 0.5s ease';
+    slides.style.transform = `translateX(-${slideWidth * currentIndex}px)`;
+  }
+
+  function nextSlide() {
+    if (currentIndex >= totalSlides - 1) return;
+    currentIndex++;
+    updateSlider();
+  }
+
+  function prevSlide() {
+    if (currentIndex <= 0) return;
+    currentIndex--;
+    updateSlider();
+  }
+
+  nextBtn.addEventListener('click', nextSlide);
+  prevBtn.addEventListener('click', prevSlide);
+
+  // Loop seamlessly
+  slides.addEventListener('transitionend', () => {
+    if (allSlides[currentIndex].isSameNode(firstClone)) {
+      slides.style.transition = 'none';
+      currentIndex = 1;
+      slides.style.transform = `translateX(-${slideWidth * currentIndex}px)`;
+    }
+    if (allSlides[currentIndex].isSameNode(lastClone)) {
+      slides.style.transition = 'none';
+      currentIndex = totalSlides - 2;
+      slides.style.transform = `translateX(-${slideWidth * currentIndex}px)`;
+    }
+  });
+}
+
+
   });
   
   
